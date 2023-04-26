@@ -1,2 +1,0 @@
-12:14:23,765 asyncio DEBUG Using selector: KqueueSelector
-12:14:54,618 asyncio DEBUG Using selector: KqueueSelector
