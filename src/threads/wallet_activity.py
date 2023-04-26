@@ -1,11 +1,16 @@
 from typing import Self
 import logging
 import asyncio
+import random
+from src.mock import User, Wallet
 
 log = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
                     level=logging.DEBUG)
+
+withdraw_chance = 0.1
+deposit_chance = 0.1
 
 
 class WalletActivity():
@@ -41,4 +46,26 @@ class WalletActivity():
 
     async def tick(self: Self) -> None:
         """Iterate."""
-        pass
+        rand = random.random()
+        rand -= withdraw_chance
+        if rand < 0:
+            user = await User.get_random()
+            balance = await Wallet.balance(user)
+            withdraw = await WalletActivity.how_much_to_withdraw(balance)
+            await Wallet.withdraw(user, withdraw)
+            return
+
+        rand -= deposit_chance
+        if rand < 0:
+            user = await User.get_random()
+            deposit = await WalletActivity.how_much_to_deposit()
+            await Wallet.deposit(user, deposit)
+            return
+
+    @staticmethod
+    async def how_much_to_withdraw(balance: int) -> int:
+        return random.randint(0, balance)
+
+    @staticmethod
+    async def how_much_to_deposit() -> int:
+        return random.randint(0, 1000000)

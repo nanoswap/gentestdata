@@ -9,13 +9,17 @@ from bizlogic.loan.writer import LoanWriter
 from bizlogic.application import LoanApplicationWriter
 from bizlogic.vouch import VouchWriter
 
-from threads.accept_loan_offer import AcceptLoanOffer
-from threads.create_application import CreateApplication
-from threads.create_loan_offer import CreateLoanOffer
-from threads.create_payment import CreatePayment
-from threads.create_vouch import CreateVouch
-from threads.wallet_activity import WalletActivity
-from threads.withdraw_application import WithdrawApplication
+from src.threads.accept_loan_offer import AcceptLoanOffer
+from src.threads.create_application import CreateApplication
+from src.threads.create_loan_offer import CreateLoanOffer
+from src.threads.create_payment import CreatePayment
+from src.threads.create_vouch import CreateVouch
+from src.threads.wallet_activity import WalletActivity
+from src.threads.withdraw_application import WithdrawApplication
+
+from src.mock import wallets
+from pandas import Series
+import matplotlib.pyplot as plt
 
 
 ipfsclient = Ipfs()
@@ -31,6 +35,11 @@ logging.basicConfig(filename=f'logs/{__name__}.txt',
 
 def main() -> None:
     """Execute threads."""
+
+    # Check initial conditions
+    wallets_before = Series(wallets, index=wallets.keys())
+
+    # Run simulation
     loop = asyncio.get_event_loop()
     loop.run_until_complete(asyncio.gather(
         AcceptLoanOffer(1, 'accept-loan', max_ticks).run(),
@@ -42,6 +51,13 @@ def main() -> None:
         WithdrawApplication(7, 'withdraw-application', max_ticks).run()
     ))
     loop.close()
+
+    # Check conditions after simulation
+    wallets_after = Series(wallets, index=wallets.keys())
+
+    plt.plot(wallets_before, color='red')
+    plt.plot(wallets_after, color='blue')
+    plt.show()
 
 
 if __name__ == "__main__":

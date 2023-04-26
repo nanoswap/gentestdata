@@ -1,2 +1,4 @@
 bizlogic
 ipfsclient
+matplotlib
+pandas
