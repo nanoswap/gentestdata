@@ -1,13 +1,11 @@
 from typing import Self
 import logging
+import asyncio
 
 log = logging.getLogger(__name__)
-logging.basicConfig(filename=f'logs_{__name__}.txt',
-                    filemode='a',
-                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
                     level=logging.DEBUG)
-
 
 
 class CreateVouch():
@@ -15,7 +13,6 @@ class CreateVouch():
 
     thread_id: int
     name: str
-    log: logging.Logger
     max_ticks: int
     tick_count: int
 
@@ -23,7 +20,6 @@ class CreateVouch():
             self: Self,
             thread_id: int,
             name: str,
-            log: logging.Logger,
             max_ticks: int) -> None:
         """Construct."""
         self.thread_id = thread_id
@@ -39,6 +35,7 @@ class CreateVouch():
             self.tick_count += 1
             log.debug("Running " + self.name)
             await self.tick()
+            await asyncio.sleep(0)  # allow the event loop to switch to another function  # noqa: E501
 
         log.debug("Exiting " + self.name)
 
