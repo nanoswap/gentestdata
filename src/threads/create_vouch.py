@@ -2,8 +2,8 @@ import threading
 from typing import Self
 
 
-class CreateLoanOffer(threading.Thread):
-    """Thread for randomly creating loan offers."""
+class CreateVouch(threading.Thread):
+    """Thread for randomly creating vouches."""
 
     thread_id: int
     name: str
