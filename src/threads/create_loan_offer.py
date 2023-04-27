@@ -2,6 +2,7 @@ from typing import Self
 import logging
 import asyncio
 import random
+import datetime
 from bizlogic.loan.writer import LoanWriter
 from bizlogic.loan.repayment import PaymentSchedule
 from src import utils
@@ -55,19 +56,24 @@ class CreateLoanOffer():
         rand -= create_chance
         if rand > 0:
             return
-        
-        # withdraw loan
-        offer_expiry_date = utils.nanosecond_epoch_to_datetime(expiry)
 
-        principal = CreateLoanOffer.principal()
-        interest = CreateLoanOffer.interest()
-        duration = CreateLoanOffer.duration()
-        payments = CreateLoanOffer.number_of_payments()
-        borrower = User.get_random()
+        # pick random lender and borrowers
+        borrower = await User.get_random()
+        lender = await User.get_random()
 
-        # check that they have enough to lend
-        if Wallet.balance(borrower) < principal:
+        if borrower == lender:
             return
+
+        # generate loan offer parameters
+        lender_balance = await Wallet.balance(lender)
+        principal = await CreateLoanOffer.principal(lender_balance)
+        interest = await CreateLoanOffer.interest()
+        duration = await CreateLoanOffer.duration()
+        payments = await CreateLoanOffer.number_of_payments()
+        offer_expiry_date = await CreateLoanOffer.expiry()
+
+        # TODO: return to wallet if the offer expires
+        await Wallet.withdraw(lender, principal)
 
         payment_schedule = PaymentSchedule.create_payment_schedule(
             amount=principal,
@@ -86,18 +92,25 @@ class CreateLoanOffer():
             offer_expiry=offer_expiry_date
         )
 
+        loan_writer.write()
+
     @staticmethod
     async def principal(balance: int) -> int:
         return random.randint(0, balance)
 
     @staticmethod
     async def interest() -> int:
-        return random.randint(0, 1000000)
+        return 1 + random.random()
 
     @staticmethod
     async def duration() -> int:
-        return random.randint(0, 1000000)
+        return random.randint(1000, 1000000)
 
     @staticmethod
     async def number_of_payments() -> int:
-        return random.randint(0, 1000000)
+        return random.randint(3, 20)
+
+    @staticmethod
+    async def expiry():
+        days = random.randint(10, 30)
+        return datetime.datetime.now() + datetime.timedelta(days=days)
