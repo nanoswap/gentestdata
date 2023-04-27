@@ -3,11 +3,14 @@ import logging
 import asyncio
 import random
 from ipfsclient.ipfs import Ipfs
+from src import utils
+import pandas as pd
+from src.mock import User, Wallet
 
 log = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
-                    level=logging.DEBUG)
+                    level=logging.INFO)
 
 withdraw_chance = 0.2
 ipfsclient = Ipfs()
@@ -35,14 +38,14 @@ class WithdrawApplication():
 
     async def run(self: Self) -> None:
         """Start thread."""
-        log.debug("Starting " + self.name)
+        log.info("Starting " + self.name)
         while self.tick_count < self.max_ticks:
             self.tick_count += 1
-            log.debug("Running " + self.name)
+            log.info("Running " + self.name)
             await self.tick()
             await asyncio.sleep(0)  # allow the event loop to switch to another function  # noqa: E501
 
-        log.debug("Exiting " + self.name)
+        log.info("Exiting " + self.name)
 
     async def tick(self: Self) -> None:
         """Iterate."""
