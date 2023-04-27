@@ -1,11 +1,15 @@
 from typing import Self
 import logging
 import asyncio
+import random
+from bizlogic.application import LoanApplicationWriter
 
 log = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
                     level=logging.DEBUG)
+
+create_chance = 0.1
 
 
 class CreateApplication():
@@ -41,4 +45,7 @@ class CreateApplication():
 
     async def tick(self: Self) -> None:
         """Iterate."""
-        pass
+        rand = random.random()
+        rand -= create_chance
+        if rand < 0:
+            pass

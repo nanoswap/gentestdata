@@ -9,8 +9,8 @@ logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(messa
                     datefmt='%H:%M:%S',
                     level=logging.DEBUG)
 
-withdraw_chance = 0.1
-deposit_chance = 0.1
+withdraw_chance = 0.2
+deposit_chance = 0.2
 
 
 class WalletActivity():
@@ -49,6 +49,7 @@ class WalletActivity():
         rand = random.random()
         rand -= withdraw_chance
         if rand < 0:
+            # withdraw from a random account
             user = await User.get_random()
             balance = await Wallet.balance(user)
             withdraw = await WalletActivity.how_much_to_withdraw(balance)
@@ -57,6 +58,7 @@ class WalletActivity():
 
         rand -= deposit_chance
         if rand < 0:
+            # deposit to a random account
             user = await User.get_random()
             deposit = await WalletActivity.how_much_to_deposit()
             await Wallet.deposit(user, deposit)

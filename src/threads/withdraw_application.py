@@ -1,11 +1,16 @@
 from typing import Self
 import logging
 import asyncio
+import random
+from ipfsclient.ipfs import Ipfs
 
 log = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
                     level=logging.DEBUG)
+
+withdraw_chance = 0.2
+ipfsclient = Ipfs()
 
 
 class WithdrawApplication():
@@ -41,4 +46,7 @@ class WithdrawApplication():
 
     async def tick(self: Self) -> None:
         """Iterate."""
-        pass
+        rand = random.random()
+        rand -= withdraw_chance
+        if rand < 0:
+            pass
